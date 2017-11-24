@@ -37,18 +37,6 @@ class HasManyOptions < AssocOptions
   end
 end
 
-# Begin writing a belongs_to method for Associatable. This method should take in the association name and an options hash. It should build a BelongsToOptions object; save this in a local variable named options.
-#
-# Within belongs_to, call define_method to create a new method to access the association. Within this method:
-#
-# Use send to get the value of the foreign key.
-# Use model_class to get the target model class.
-# Use where to select those models where the primary_key column is equal to the foreign key value.
-# Call first (since there should be only one such item).
-# Throughout this method definition, use the options object so that defaults are used appropriately.
-
-# Do likewise for has_many.
-
 module Associatable
   # Phase IIIb
   def belongs_to(name, options = {})
@@ -60,24 +48,34 @@ module Associatable
 
       # get the value for the foreign key of the current record
       # (i.e. instance) from the current table
-      foreign_key_value = self.send(foreign_key.to_sym)
+      foreign_key_value = self.send(foreign_key)  #(foreign_key.to_sym)
 
       # get the target model class that this record belongs to
       model_class = data.model_class
 
-      # link the primary key of the table this record belongs to
-      # with this record's foreign key
+      # link the primary key of the table this record belongs to (target table)
+      # with this record's foreign key. return the associated object
       model_class.where(id: foreign_key_value).first
     end
   end
 
   def has_many(name, options = {})
-    data = HasManyOptions.new(name, options)
+    # pass in `self` as `self_class_name` because this association will
+    # be associated with the current record's table
+    data = HasManyOptions.new(name, self, options)
 
     define_method(name) do
+      # link target table's foreign key with current table's primary key
+      foreign_key = data.foreign_key
 
-    end
-  end
+      # get current table's primary key
+      primary_key = data.primary_key
+      primary_key_value = self.send(primary_key)
+
+      # find an array of results where target's foreign key matches current table's primary key
+      model_class = data.model_class
+      model_class.where(foreign_key => primary_key_value)
+    end  end
 
   def assoc_options
     # Wait to implement this in Phase IVa. Modify `belongs_to`, too.
@@ -85,6 +83,5 @@ module Associatable
 end
 
 class SQLObject
-  # Mixin Associatable here...
   extend Associatable
 end
