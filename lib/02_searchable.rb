@@ -6,11 +6,12 @@ module Searchable
     where_columns = params.keys.map { |attr_name| "#{attr_name} = ?"}.join(" AND ")
     where_values = params.values
 
+    # because of `extend`, `self` is the class object
     record_hashes = DBConnection.execute(<<-SQL, where_values)
       SELECT
         *
       FROM
-        #{table_name} -- because of `extend`, `self` is the class object
+        #{table_name}
       WHERE
         #{where_columns}
     SQL
