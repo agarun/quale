@@ -1,7 +1,6 @@
 require_relative '02_searchable'
 require 'active_support/inflector'
 
-# Phase IIIa
 class AssocOptions
   attr_accessor(
     :class_name,
@@ -41,6 +40,7 @@ module Associatable
   # Phase IIIb
   def belongs_to(name, options = {})
     data = BelongsToOptions.new(name, options)
+    assoc_options[name] = data
 
     define_method(name) do
       # get the foreign key column on the current table
@@ -75,10 +75,12 @@ module Associatable
       # find an array of results where target's foreign key matches current table's primary key
       model_class = data.model_class
       model_class.where(foreign_key => primary_key_value)
-    end  end
+    end
+  end
 
+  # saves options for each association method
   def assoc_options
-    # Wait to implement this in Phase IVa. Modify `belongs_to`, too.
+    @hash ||= {}
   end
 end
 
