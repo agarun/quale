@@ -1,12 +1,5 @@
 require_relative 'db_connection'
 require 'active_support/inflector'
-# TODO: remove this comment:
-# NB: the attr_accessor we wrote in phase 0 is NOT used in the rest
-# of this project. It was only a warm up.
-
-# #insert: insert a new row into the table to represent the SQLObject.
-# #update: update the row with the id of this SQLObject
-# #save: convenience method that either calls insert/update depending on whether or not the SQLObject already exists in the table.
 
 class SQLObject
   def self.columns
@@ -89,7 +82,7 @@ class SQLObject
   # NOTE: cannot simply use `#attributes.values` because it
   # will not include `nil` values (e.g. when there is no `id` yet)
   def attribute_values
-    self.class.columns.map { |x| send(x) }
+    self.class.columns.map { |attr_name| send(attr_name) }
   end
 
   # FIXME: `#insert` and `#update` should be private methods

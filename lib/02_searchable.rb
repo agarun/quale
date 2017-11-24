@@ -16,18 +16,6 @@ module Searchable
     SQL
 
     parse_all(record_hashes)
-
-    # haskell_cats = Cat.where(:name => "Haskell", :color => "calico")
-    # # SELECT
-    # #   *
-    # # FROM
-    # #   cats
-    # # WHERE
-    # #   name = ? AND color = ?
-    # I used a local variable where_line where I mapped the keys of the params to "#{key} = ?" and joined with AND.
-    #
-    # To fill in the question marks, I used the values of the params object.
-
   end
 end
 
