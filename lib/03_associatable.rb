@@ -80,7 +80,7 @@ module Associatable
 
   # saves options for each association method
   def assoc_options
-    @hash ||= {}
+    @options ||= {}
   end
 end
 
