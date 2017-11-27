@@ -38,6 +38,26 @@ module Associatable
   end
 end
 
+# alternative `has_one_through` implementation
+# def has_one_through(name, through_name, source_name)
+#   define_method(name) do
+#     through_options = self.class.assoc_options[through_name]
+#     source_options = through_options.model_class.assoc_options[source_name]
+#
+#     through_f_k = self.send(through_options.foreign_key)
+#     source_f_k = through_options
+#       .model_class
+#       .where(id: through_f_k)
+#       .first
+#       .send(source_options.foreign_key)
+#
+#     source_options
+#       .model_class
+#       .where(id: source_f_k)
+#       .first
+#   end
+# end
+
 # as an example, we are mimicking:
 #
 # class Cat < ApplicationRecord
