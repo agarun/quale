@@ -118,7 +118,7 @@ class SQLObject
       .map { |attr_name| "#{attr_name} = ?" }
       .join(", ")
 
-    DBConnection.execute(<<-SQL, attribute_values, id: attributes[:id])
+    DBConnection.execute(<<-SQL, attribute_values, id: id)
       UPDATE
         #{self.class.table_name}
       SET
@@ -130,7 +130,7 @@ class SQLObject
 
   def destroy
     if self.class.find(attributes[:id])
-      DBConnection.execute(<<-SQL, id: attributes[:id])
+      DBConnection.execute(<<-SQL, id: id)
         DELETE
         FROM
           #{self.class.table_name}
