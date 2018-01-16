@@ -1,7 +1,12 @@
-require_relative 'db_connection'
+require_relative 'connection'
+require_relative 'associatable'
+require_relative 'searchable'
 require 'active_support/inflector'
 
 class SQLObject
+  extend Searchable
+  extend Associatable
+
   def self.columns
     # the first element in `execute2` output is an array of column name strings
     @columns ||=
@@ -11,8 +16,8 @@ class SQLObject
         FROM
           #{table_name}
       SQL
-      .first
-      .map(&:to_sym)
+        .first
+        .map(&:to_sym)
   end
 
   # automatically adds getter and setter methods for each column because
@@ -32,7 +37,7 @@ class SQLObject
   # get the name of the table for the class
   # using `String#tableize` from ActiveSupport::Inflector
   def self.table_name
-    @table_name || "#{self}".tableize
+    @table_name || self.to_s.tableize
   end
 
   # fetch `all` the records from the database (name derived from `::table_name`)
@@ -69,7 +74,9 @@ class SQLObject
 
   def initialize(params = {})
     params.each do |attr_name, value|
-      raise "unknown attribute '#{attr_name}'" unless self.class.columns.include?(attr_name.to_sym)
+      unless self.class.columns.include?(attr_name.to_sym)
+        raise "unknown attribute '#{attr_name}'"
+      end
 
       send("#{attr_name.to_sym}=", value) # setter defined in `::finalize!`
     end
@@ -102,7 +109,11 @@ class SQLObject
   end
 
   def update
-    set_columns = self.class.columns.map { |attr_name| "#{attr_name} = ?"}.join(", ")
+    set_columns = self
+      .class
+      .columns
+      .map { |attr_name| "#{attr_name} = ?" }
+      .join(", ")
 
     DBConnection.execute(<<-SQL, attribute_values, id: attributes[:id])
       UPDATE

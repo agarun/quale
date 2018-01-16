@@ -1,9 +1,12 @@
-require_relative 'db_connection'
-require_relative '01_sql_object'
+require_relative 'connection'
+require_relative 'sql_object'
 
 module Searchable
   def where(params)
-    where_columns = params.keys.map { |attr_name| "#{attr_name} = ?"}.join(" AND ")
+    where_columns = params
+      .keys
+      .map { |attr_name| "#{attr_name} = ?" }
+      .join(" AND ")
     where_values = params.values
 
     # because of `extend`, `self` is the class object
@@ -18,8 +21,4 @@ module Searchable
 
     parse_all(record_hashes)
   end
-end
-
-class SQLObject
-  extend Searchable
 end
