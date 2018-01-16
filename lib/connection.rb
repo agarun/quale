@@ -1,13 +1,11 @@
 require 'sqlite3'
 
 PRINT_QUERIES = ENV['PRINT_QUERIES'] == 'true'
-ROOT_FOLDER = File.join(File.dirname(__FILE__), '..')
+ROOT_FOLDER = File.join(File.dirname(__FILE__), '../spec')
 CATS_SQL_FILE = File.join(ROOT_FOLDER, 'cats.sql')
 CATS_DB_FILE = File.join(ROOT_FOLDER, 'cats.db')
 
 class DBConnection
-  private_class_method :print_query
-
   def self.print_query(query, *interpolation_args)
     return unless PRINT_QUERIES
 

@@ -1,5 +1,4 @@
 require_relative 'connection'
-require_relative 'sql_object'
 
 module Searchable
   def where(params)
