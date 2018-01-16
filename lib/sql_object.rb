@@ -57,6 +57,10 @@ class SQLObject
     results.map { |record_hash| self.new(record_hash) }
   end
 
+  def self.destroy_all
+    all.each(&:destroy)
+  end
+
   # return a single object with the given 'id' (primary key)
   # note `DBConnection.execute` returns an array even if there is one result
   def self.find(id)
@@ -92,7 +96,6 @@ class SQLObject
     self.class.columns.map { |attr_name| send(attr_name) }
   end
 
-  # FIXME: `#insert` and `#update` should be private methods
   # insert new record (self) and initialize the record's primary key
   def insert
     column_names = self.class.columns.join(", ") # => "col1, col2, col3, ..."
@@ -123,6 +126,18 @@ class SQLObject
       WHERE
         id = :id
     SQL
+  end
+
+  def destroy
+    if self.class.find(attributes[:id])
+      DBConnection.execute(<<-SQL, id: attributes[:id])
+        DELETE
+        FROM
+          #{self.class.table_name}
+        WHERE
+          id = :id
+      SQL
+    end
   end
 
   def save
