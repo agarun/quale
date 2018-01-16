@@ -1,5 +1,5 @@
-require '01_sql_object'
-require 'db_connection'
+require 'sql_object'
+require 'connection'
 require 'securerandom'
 
 describe SQLObject do
@@ -8,8 +8,7 @@ describe SQLObject do
 
   context 'before ::finalize!' do
     before(:each) do
-      class Cat < SQLObject
-      end
+      class Cat < SQLObject; end
     end
 
     after(:each) do
@@ -86,10 +85,10 @@ describe SQLObject do
     describe '::finalize!' do
       it 'creates getter methods for each column' do
         c = Cat.new
-        expect(c.respond_to? :something).to be false
-        expect(c.respond_to? :name).to be true
-        expect(c.respond_to? :id).to be true
-        expect(c.respond_to? :owner_id).to be true
+        expect(c.respond_to?(:something)).to be false
+        expect(c.respond_to?(:name)).to be true
+        expect(c.respond_to?(:id)).to be true
+        expect(c.respond_to?(:owner_id)).to be true
       end
 
       it 'creates setter methods for each column' do
@@ -104,7 +103,7 @@ describe SQLObject do
 
       it 'created getter methods read from attributes hash' do
         c = Cat.new
-        c.instance_variable_set(:@attributes, {name: "Nick Diaz"})
+        c.instance_variable_set(:@attributes, name: "Nick Diaz")
         expect(c.name).to eq 'Nick Diaz'
       end
 
@@ -120,16 +119,15 @@ describe SQLObject do
 
     describe '#initialize' do
       it 'calls appropriate setter method for each item in params' do
-        # We have to set method expectations on the cat object *before*
-        # #initialize gets called, so we use ::allocate to create a
-        # blank Cat object first and then call #initialize manually.
+        # use ::allocate to create a blank Cat object first and
+        # then call #initialize manually.
         c = Cat.allocate
 
         expect(c).to receive(:name=).with('Don Frye')
         expect(c).to receive(:id=).with(100)
         expect(c).to receive(:owner_id=).with(4)
 
-        c.send(:initialize, {name: 'Don Frye', id: 100, owner_id: 4})
+        c.send(:initialize, name: 'Don Frye', id: 100, owner_id: 4)
       end
 
       it 'throws an error when given an unknown attribute' do
@@ -200,7 +198,6 @@ describe SQLObject do
       end
 
       it 'creates a new record with the correct values' do
-        # pull the cat again
         cat2 = Cat.find(cat.id)
 
         expect(cat2.name).to eq('Gizmo')
@@ -216,7 +213,6 @@ describe SQLObject do
         human.lname = 'von Rubens'
         human.update
 
-        # pull the human again
         human = Human.find(2)
         expect(human.fname).to eq('Matthew')
         expect(human.lname).to eq('von Rubens')
